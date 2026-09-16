@@ -1,0 +1,25 @@
+﻿apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: backend-ingress
+    namespace: dupontdoku-staging
+    annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-staging
+spec:
+    ingressClassName: nginx
+    tls:
+        -   hosts:
+                - staging.dupontarchive.mov
+            secretName: backend-tls
+    rules:
+        -   host: staging.dupontarchive.mov
+            http:
+                paths:
+                    # API Path
+                    -   path: /api/
+                        pathType: Prefix
+                        backend:
+                            service:
+                                name: backend-service
+                                port:
+                                    number: 80

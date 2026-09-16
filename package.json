@@ -1,0 +1,30 @@
+{
+	"name": "dupontdoku-backend",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/development/index.ts",
+		"dev:no-tunnel": "tsx watch src/app/index.ts",
+		"build": "tsc",
+		"start": "node dist/app/index.js"
+	},
+	"dependencies": {
+		"@ngrok/ngrok": "^1.7.0",
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.6",
+		"cryptr": "^6.4.0",
+		"dotenv": "^17.2.1",
+		"express": "^5.2.1",
+		"mongodb-memory-server": "^11.2.0",
+		"mongoose": "^9.10.1"
+	},
+	"devDependencies": {
+		"@types/cookie-parser": "^1.4.10",
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.6",
+		"@types/node": "^20",
+		"tsx": "^4.20.3",
+		"typescript": "^5"
+	}
+}
