@@ -119,6 +119,23 @@ async function getFreshAccessToken(anonymousUserId: string): Promise<string | nu
 // cookie-parser must be installed before these routes run
 export const spotifyAuthCookies = cookieParser();
 
+// Small page that reports the OAuth result to the parent window (silent
+// iframe flow) and/or the opener (popup flow) via postMessage.
+function callbackResultPage(type: "dupontdoku:spotify-connected" | "dupontdoku:spotify-auth-failed", message = ""): string {
+	return `<!doctype html><title>Dupontdoku</title>
+<body style="margin:0;background:#ffffff">
+<script>
+  const payload = JSON.stringify({ type: ${JSON.stringify(type)}, message: ${JSON.stringify(message)} });
+  if (window.parent !== window) {
+    window.parent.postMessage(payload, "*");
+  }
+  if (window.opener) {
+    window.opener.postMessage(payload, "*");
+  }
+</script>
+</body>`;
+}
+
 export const spotifyAuthController = {
 	// Step 0: frontend asks whether this browser is connected
 	async status(req: Request, res: Response): Promise<void> {
@@ -153,12 +170,12 @@ export const spotifyAuthController = {
 		
 		const { code, state } = req.query;
 		if (typeof code !== "string" || typeof state !== "string") {
-			res.status(400).json({ error: "Invalid OAuth callback" });
+			res.status(400).type("text/html").send(callbackResultPage("dupontdoku:spotify-auth-failed", "Invalid OAuth callback"));
 			return;
 		}
 		const stateDoc = await SpotifyOAuthStateModel.findOneAndDelete({ state }).exec();
 		if (stateDoc === null) {
-			res.status(400).json({ error: "State mismatch or expired" });
+			res.status(400).type("text/html").send(callbackResultPage("dupontdoku:spotify-auth-failed", "State mismatch or expired"));
 			return;
 		}
 		const anonymousUserId = stateDoc.anonymousUserId;
@@ -192,25 +209,10 @@ export const spotifyAuthController = {
 			// the flow ran inside an iframe on the frontend — the callback page
 			// itself stays invisible: it only posts the result to the parent,
 			// which shows its own confirmation and closes the window
-			const displayName = profile.display_name ?? "";
-			res.type("text/html").send(`<!doctype html><title>Dupontdoku</title>
-<body style="margin:0;background:#ffffff">
-<script>
-  const payload = JSON.stringify({ type: "dupontdoku:spotify-connected", displayName: ${JSON.stringify(displayName)} });
-  if (window.parent !== window) {
-    window.parent.postMessage(payload, "*");
-  }
-  if (window.opener) {
-    window.opener.postMessage(payload, "*");
-  }
-</script>
-</body>`);
+			res.type("text/html").send(callbackResultPage("dupontdoku:spotify-connected"));
 		} catch (err) {
 			const message = err instanceof Error ? err.message : "Unknown error";
-			res.status(500).type("text/html").send(`<!doctype html><title>Dupontdoku</title>
-<body style="font-family:Tahoma,sans-serif;background:#ece9d8;text-align:center;padding-top:4em">
-<p>❌ Spotify connection failed: ${message}</p>
-</body>`);
+			res.status(500).type("text/html").send(callbackResultPage("dupontdoku:spotify-auth-failed", message));
 		}
 	},
 
