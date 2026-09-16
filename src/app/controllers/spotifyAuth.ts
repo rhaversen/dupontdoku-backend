@@ -189,18 +189,20 @@ export const spotifyAuthController = {
 				{ upsert: true },
 			);
 
-			// the flow ran in a popup — notify the opener so it can retry the
-			// playback token and close the popup
-			const frontendOrigin = process.env.CORS_ORIGIN?.split(",")[0]?.trim() ?? "";
+			// the flow ran inside an iframe on the frontend — the callback page
+			// itself stays invisible: it only posts the result to the parent,
+			// which shows its own confirmation and closes the window
+			const displayName = profile.display_name ?? "";
 			res.type("text/html").send(`<!doctype html><title>Dupontdoku</title>
-<body style="font-family:Tahoma,sans-serif;background:#ece9d8;text-align:center;padding-top:4em">
-<p>✅ Dupontdoku player connected${profile.display_name ? ` as ${profile.display_name}` : ""}.</p>
-<p>This window will close automatically.</p>
+<body style="margin:0;background:#ffffff">
 <script>
-  if (window.opener) {
-    window.opener.postMessage("dupontdoku:spotify-connected", ${JSON.stringify(frontendOrigin)});
+  const payload = JSON.stringify({ type: "dupontdoku:spotify-connected", displayName: ${JSON.stringify(displayName)} });
+  if (window.parent !== window) {
+    window.parent.postMessage(payload, "*");
   }
-  setTimeout(() => window.close(), 1200);
+  if (window.opener) {
+    window.opener.postMessage(payload, "*");
+  }
 </script>
 </body>`);
 		} catch (err) {
