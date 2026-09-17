@@ -2,19 +2,13 @@ import mongoose from "mongoose";
 
 import { shutDown } from "../index.js";
 
-const { DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, NODE_ENV } = process.env as Record<string, string>;
+import config from "./setupConfig.js";
 
-const mongooseOpts = {
-	dbName: DB_NAME,
-	retryWrites: true,
-	w: "majority" as const,
-	appName: "DupontdokuBackend",
-};
+const { NODE_ENV, DB_NAME, DB_USER, DB_PASSWORD, DB_HOST } = process.env as Record<string, string>;
 
-const maxRetryAttempts = 5;
-const retryInterval = 5000;
+const { mongooseOpts, maxRetryAttempts, retryInterval, retryWrites, w, appName } = config;
 
-const mongoUri = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/?retryWrites=true&w=majority&appName=DupontdokuBackend`;
+const mongoUri = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?retryWrites=${retryWrites}&w=${w}&appName=${appName}`;
 
 function isMemoryDatabase(): boolean {
 	return mongoose.connection.host.toString() === "127.0.0.1";

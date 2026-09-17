@@ -8,6 +8,7 @@ RUN useradd -m dupontdoku_backend_user
 
 COPY dist/ ./dist/
 COPY package*.json ./
+COPY config/ ./config/
 
 RUN chown -R dupontdoku_backend_user:dupontdoku_backend_user /app
 
