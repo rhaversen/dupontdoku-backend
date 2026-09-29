@@ -9,7 +9,6 @@ createCrudRouter(router, TourDateModel, transformTourDate, (body) => ({
 	city: body.city,
 	venue: body.venue,
 	ticketUrl: body.ticketUrl,
-	notes: body.notes,
 	sortOrder: body.sortOrder,
 }));
 

@@ -8,7 +8,6 @@ export interface ITourDate extends Document {
 	venue: string;
 	// per-show ticket shop (empty if tickets go through the general URL)
 	ticketUrl: string;
-	notes: string;
 	sortOrder: number;
 	createdAt: Date;
 	updatedAt: Date;
@@ -19,7 +18,6 @@ const tourDateSchema = new Schema<ITourDate>({
 	city: { type: String, required: true, trim: true },
 	venue: { type: String, required: true, trim: true },
 	ticketUrl: { type: String, default: "", trim: true },
-	notes: { type: String, default: "", trim: true },
 	sortOrder: { type: Number, default: 0 },
 }, { timestamps: true });
 
@@ -33,9 +31,6 @@ export function transformTourDate(doc: ITourDate | Record<string, unknown>): Rec
 		city: d.city,
 		venue: d.venue,
 		ticketUrl: d.ticketUrl,
-		notes: d.notes,
 		sortOrder: d.sortOrder,
-		createdAt: d.createdAt,
-		updatedAt: d.updatedAt,
 	};
 }

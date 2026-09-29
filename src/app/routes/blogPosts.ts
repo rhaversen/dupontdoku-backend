@@ -7,7 +7,6 @@ const router = Router();
 createCrudRouter(router, BlogPostModel, transformBlogPost, (body) => ({
 	title: body.title,
 	body: body.body,
-	slug: body.slug,
 	published: body.published,
 }));
 

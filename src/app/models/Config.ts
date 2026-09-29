@@ -1,20 +1,16 @@
 import { Schema, model, type Document } from "mongoose";
 
 export interface IConfig extends Document {
-	welcomeMessage: string;
+	bio: string;
 	contactEmail: string;
-	heroText: string;
 	footerNote: string;
-	// main "Get Tickets" button — the one ticket shop covering the tour
+	// main "Tickets" fallback — the one ticket shop covering the tour
 	generalTicketUrl: string;
-	createdAt: Date;
-	updatedAt: Date;
 }
 
 const configSchema = new Schema<IConfig>({
-	welcomeMessage: { type: String, default: "Welcome to dupontdoku." },
+	bio: { type: String, default: "" },
 	contactEmail: { type: String, default: "" },
-	heroText: { type: String, default: "" },
 	footerNote: { type: String, default: "" },
 	generalTicketUrl: { type: String, default: "" },
 }, { timestamps: true });
@@ -22,8 +18,8 @@ const configSchema = new Schema<IConfig>({
 export const ConfigModel = model<IConfig>("Config", configSchema);
 
 export function transformConfig(config: IConfig | Record<string, unknown>): Record<string, unknown> {
-	const { welcomeMessage, heroText, contactEmail, footerNote, generalTicketUrl, createdAt, updatedAt } = config as IConfig;
-	return { welcomeMessage, heroText, contactEmail, footerNote, generalTicketUrl, createdAt, updatedAt };
+	const { bio, contactEmail, footerNote, generalTicketUrl } = config as IConfig;
+	return { bio, contactEmail, footerNote, generalTicketUrl };
 }
 
 export async function getOrCreateConfig(): Promise<IConfig> {

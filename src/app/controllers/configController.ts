@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { getOrCreateConfig, transformConfig } from "../models/Config.js";
 
-const CONFIG_FIELDS = ["welcomeMessage", "contactEmail", "heroText", "footerNote", "generalTicketUrl"] as const;
+const CONFIG_FIELDS = ["bio", "contactEmail", "footerNote", "generalTicketUrl"] as const;
 
 export async function getConfig(_req: Request, res: Response, next: NextFunction) {
 	try {
